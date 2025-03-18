@@ -2,29 +2,34 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -std=c++17 -O3 -I/globalhome/pma753/HPC/root/install/include
-
-# Linker flags
-LDFLAGS = -L/globalhome/pma753/HPC/root/install/lib64
+CXXFLAGS = -std=c++17 -O3 -Iinclude -I/path/to/your/include -L/path/to/your/library
 
 # Libraries
 LIBS = -lcaf_core -lcaf_io
 
-# Source files
-SRCS = SW-Actor.cpp readFasta.cpp makePairs.cpp
+# Source files (organized under src/)
+SRCS = src/main.cpp \
+       src/actors/managerActor.cpp \
+       src/utils/readFasta.cpp \
+       src/utils/makePairs.cpp \
+       src/actors/clientActor.cpp \
+       src/actors/serialActor.cpp \
+       src/actors/pairActor.cpp \
+       src/actors/blockActor.cpp
 
-# Target executable
-TARGET = swActor
+# Target executable (store in build/)
+TARGET = build/swActor
 
 # Set library path
-export LD_LIBRARY_PATH := /globalhome/pma753/HPC/root/install/lib64:$(LD_LIBRARY_PATH)
+export LD_LIBRARY_PATH := /path/to/your/library:$(LD_LIBRARY_PATH)
 
 # Build rule
 all: $(TARGET)
 
 $(TARGET): $(SRCS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $(TARGET) $(SRCS) $(LIBS)
+	@mkdir -p build
+	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS) $(LIBS)
 
 # Clean rule
 clean:
-	rm -f $(TARGET)
+	rm -rf build/
