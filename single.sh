@@ -9,7 +9,7 @@
 
 cd $SLURM_SUBMIT_DIR
 
-export LD_LIBRARY_PATH := /path/to/your/library:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH= /path/to/your/library:$LD_LIBRARY_PATH
 
 
 make clean
@@ -20,4 +20,4 @@ cd build
 # Run your program
 echo "BRCA1 1 node 40 cpu"
 
-./swActor -Q dataset/BRCA1.fasta -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40
+./swActor -Q ../dataset/BRCA1.fasta -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40

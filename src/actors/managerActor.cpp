@@ -1,5 +1,4 @@
 #include "managerActor.hpp"
-#include "serialActor.hpp"
 #include "pairActor.hpp"
 #include "makePairs.hpp"
 #include "readFasta.hpp"
@@ -48,36 +47,23 @@ namespace caf
             self->state().maxLenSubject = self->state().maxLenQuery;
         }
 
-        // Start the timer
         self->state().start = std::chrono::high_resolution_clock::now();
 
-        if (cfg.deviderRow == 1 && cfg.deviderCol == 1)
+        self->println("Query sequences: {}", self->state().querySequences.size());
+        self->println("Subject sequences: {}", self->state().subjectSequences.size());
+
+        for (int i = 0; i < cfg.actorNumber; ++i)
         {
-            for (int i = 0; i < cfg.actorNumber; ++i)
-            {
-                actor worker = self->spawn(serialActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore);
+            actor worker = self->spawn(pairActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore,
+                                       cfg.deviderRow, cfg.deviderCol);
 
-                std::string seq1 = self->state().querySequences[self->state().workList1[i]];
-                std::string seq2 = self->state().subjectSequences[self->state().workList2[i]];
+            std::string seq1 = self->state().querySequences[self->state().workList1[i]];
+            std::string seq2 = self->state().subjectSequences[self->state().workList2[i]];
 
-                anon_mail(self->state().maxLenQuery, self->state().maxLenSubject).send(worker);
-                anon_mail(self, i, seq1, seq2).send(worker);
-            }
+            anon_mail(self->state().maxLenQuery, self->state().maxLenSubject).send(worker);
+            anon_mail(self, i, seq1, seq2).send(worker);
         }
-        else
-        {
-            for (int i = 0; i < cfg.actorNumber; ++i)
-            {
-                actor worker = self->spawn(pairActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore,
-                                           cfg.deviderRow, cfg.deviderCol);
 
-                self->state().start = std::chrono::high_resolution_clock::now();
-                std::string seq1 = self->state().querySequences[self->state().workList1[i]];
-                std::string seq2 = self->state().subjectSequences[self->state().workList2[i]];
-
-                anon_mail(self, i, seq1, seq2).send(worker);
-            }
-        }
         self->state().position = cfg.actorNumber - 1;
 
         return {
@@ -90,7 +76,7 @@ namespace caf
                 {
                     std::string seq1 = self->state().querySequences[self->state().workList1[self->state().position]];
                     std::string seq2 = self->state().subjectSequences[self->state().workList2[self->state().position]];
-                    anon_mail(self, self->state().position, seq1, seq2).send(sender);
+                    anon_mail(self->state().position, seq1, seq2).send(sender);
                 }
                 else
                 {

@@ -80,12 +80,11 @@ to control the thread pool size used by CAF's scheduler.
 ---
   
 ## Credits
-The implementation of SW-Actors builds on the foundation provided by the [Smith–Waterman algorithm](https://icbi.i-med.ac.at/courses/bioinformatics_ex_2021/7265238.pdf) and the [C++ Actor Framework](https://github.com/actor-framework/actor-framework). We credit the original creators of the C++ Actor Framework which allowed us to implement the actor model into SUMMA-Actors. Links to their research work can be found below.
+The implementation of SW-Actors builds on the foundation provided by the [Smith–Waterman algorithm](https://icbi.i-med.ac.at/courses/bioinformatics_ex_2021/7265238.pdf) and the [C++ Actor Framework](https://github.com/actor-framework/actor-framework). We credit the original creators of the C++ Actor Framework which allowed us to implement the actor model into SW-Actors. Links to their research work can be found below.
 
  * Charousset, D., Schmidt, T. C., Hiesgen, R., Wählisch, M., 2013: Native actors: 
  a scalable software platform for distributed, heterogeneous environments. _AGERE!_, 
  [doi:10.1145/2541329.2541336](http://dx.doi.org/10.1145/2541329.2541336).
 
  * Charousset, D., Schmidt, T. C., Hiesgen, R., 2016: Revisiting actor programming in 
- C++. _Computer Languages, Systems & Structures_, [doi:10.1016/j.cl.2016.01.002](http://
- dx.doi.org/10.1016/j.cl.2016.01.002)
+ C++. _Computer Languages, Systems & Structures_, [doi:10.1016/j.cl.2016.01.002](http://dx.doi.org/10.1016/j.cl.2016.01.002)

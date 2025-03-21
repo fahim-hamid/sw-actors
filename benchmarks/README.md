@@ -114,5 +114,11 @@ sbatch SWIPE.sh
 
 - Ensure all dependencies (`Parasail`, `SWIPE`, `SeqAN`, etc.) are **installed and loaded** before running.
 
+## Credits
+The benchmarking setup presented here relies on the work and tools developed by the authors of **Parasail**, **SeqAN**, and **SWIPE**, whose implementations form the basis of our performance comparisons. We gratefully acknowledge their contributions to the bioinformatics community.
+- **Parasail:** Daily, J., 2016. Parasail: SIMD C library for global, semi-global, and local pairwise sequence alignments. *BMC Bioinformatics*, [doi:10.1186/s12859-016-0930-z](https://doi.org/10.1186/s12859-016-0930-z)
+- **SeqAN:** Reinert, K., et al., 2017. The SeqAn C++ template library for efficient sequence analysis: A resource for programmers. *Journal of Biotechnology*, [doi:10.1016/j.jbiotec.2017.07.017](https://doi.org/10.1016/j.jbiotec.2017.07.017)
+- **SWIPE:** Rognes, T., 2011. Faster Smith–Waterman database searches with inter-sequence SIMD parallelisation. *BMC Bioinformatics*, [doi:10.1186/1471-2105-12-221](https://doi.org/10.1186/1471-2105-12-221)
+
 ---
 

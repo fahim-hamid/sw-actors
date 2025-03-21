@@ -22,6 +22,8 @@ namespace caf
         std::string alignedSeq2;
         actor manager;
         int position;
+        int maxLenQuery = 0;
+        int maxLenSubject = 0;
     };
 
     behavior pairActor(stateful_actor<pairActorState> *self, int matchScore, int mismatchScore, int gapScore, int deviderRow, int deviderCol);

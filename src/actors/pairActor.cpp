@@ -1,3 +1,4 @@
+#include "serialActor.hpp"
 #include "pairActor.hpp"
 #include "blockActor.hpp"
 
@@ -19,10 +20,24 @@ namespace caf
             },
             [=](actor manager, int position, std::string seq1, std::string seq2)
             {
-                actor blockAct = self->spawn(blockActor, actor_cast<actor>(self), 0, seq1, seq2, self->state().matchScore, self->state().mismatchScore, self->state().gapScore, self->state().deviderRow, self->state().deviderCol);
+                if (self->state().deviderRow == 1 && self->state().deviderCol == 1)
+                {
+                    actor serialAct = self->spawn(serialActor, self->state().matchScore, self->state().mismatchScore, self->state().gapScore);
+                    anon_mail(manager, self->state().maxLenQuery, self->state().maxLenSubject).send(serialAct);
+                    anon_mail(position, seq1, seq2).send(serialAct);
+                }
+                else
+                {
+                    actor blockAct = self->spawn(blockActor, actor_cast<actor>(self), 0, seq1, seq2, self->state().matchScore, self->state().mismatchScore, self->state().gapScore, self->state().deviderRow, self->state().deviderCol);
+                }
                 self->state().manager = manager;
                 self->state().position = position;
                 self->state().workers.resize(self->state().deviderRow);
+            },
+            [=](int position, std::string seq1, std::string seq2)
+            {
+                actor blockAct = self->spawn(blockActor, actor_cast<actor>(self), 0, seq1, seq2, self->state().matchScore, self->state().mismatchScore, self->state().gapScore, self->state().deviderRow, self->state().deviderCol);
+                self->state().position = position;
             },
             [=](actor worker, int rowPose, int maxScore, int maxRow, int maxCol)
             {
@@ -66,7 +81,11 @@ namespace caf
                     anon_mail(row, col).send(self->state().workers[rowPose]);
                 }
             },
-            [=](int maxLenQuery, int maxLenSubject) {},
+            [=](int maxLenQuery, int maxLenSubject)
+            {
+                self->state().maxLenQuery = maxLenQuery;
+                self->state().maxLenSubject = maxLenSubject;
+            },
             [=](std::string exit)
             {
                 self->quit();

@@ -13,7 +13,7 @@ IP=$(srun --nodes=1 --ntasks=1 hostname -i)
 # Run the code
 for node in $(scontrol show hostnames); do
     echo $node
-export LD_LIBRARY_PATH := /path/to/your/library:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH= /path/to/your/library:$LD_LIBRARY_PATH
 
     cd $SLURM_SUBMIT_DIR
     
@@ -23,7 +23,7 @@ export LD_LIBRARY_PATH := /path/to/your/library:$LD_LIBRARY_PATH
 
     if [ $counter -eq 0 ]; then
         IP=$(srun --nodes=1 --ntasks=1 hostname -i)
-        srun --nodes=1 --ntasks=1 ./swActor -D -s -p 4444 -Q dataset/BRCA1.fasta -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40&
+        srun --nodes=1 --ntasks=1 ./swActor -D -s -p 4444 -Q ../dataset/BRCA1.fasta -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40&
         sleep 2
         counter=$((counter + 1))
         echo "lets do"

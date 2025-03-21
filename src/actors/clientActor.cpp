@@ -1,5 +1,4 @@
 #include "clientActor.hpp"
-#include "serialActor.hpp"
 #include "pairActor.hpp"
 
 namespace caf
@@ -22,22 +21,11 @@ namespace caf
 
         self->state().server = *serverActor;
 
-        if (cfg.deviderRow == 1 && cfg.deviderCol == 1)
+        for (int i = 0; i < cfg.actorNumber; ++i)
         {
-            for (int i = 0; i < cfg.actorNumber; ++i)
-            {
-                actor worker = self->spawn(serialActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore);
-                anon_mail(self->state().server).send(worker);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < cfg.actorNumber; ++i)
-            {
-                actor worker = self->spawn(pairActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore,
-                                           cfg.deviderRow, cfg.deviderCol);
-                anon_mail(self->state().server).send(worker);
-            }
+            actor worker = self->spawn(pairActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore,
+                                       cfg.deviderRow, cfg.deviderCol);
+            anon_mail(self->state().server).send(worker);
         }
 
         return {};

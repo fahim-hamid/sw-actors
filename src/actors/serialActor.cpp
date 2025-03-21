@@ -11,11 +11,12 @@ namespace caf
 
         // receive the messages
         return {
-            [=](int maxLenQuery, int maxLenSubject)
+            [=](actor manager, int maxLenQuery, int maxLenSubject)
             {
                 self->state().scoreMatrix = std::vector<std::vector<int>>(maxLenQuery + 1, std::vector<int>(maxLenSubject + 1, 0));
+                self->state().manager = manager;
             },
-            [=](actor manager, int position, std::string seq1, std::string seq2)
+            [=](int position, std::string seq1, std::string seq2)
             {
                 int m = seq1.length();
                 int n = seq2.length();
@@ -81,11 +82,7 @@ namespace caf
                 }
                 self->println("Pair: {}, with score: {}, \nAligned seq1: {}, \nAligned seq2: {}\n", position, maxScore, alignedSeq1, alignedSeq2);
 
-                anon_mail(self, position, maxScore).send(manager);
-            },
-            [=](actor serverOrManager)
-            {
-                anon_mail(self).send(serverOrManager);
+                anon_mail(self, position, maxScore).send(self->state().manager);
             },
             [=](std::string exit)
             {
