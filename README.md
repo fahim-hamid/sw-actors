@@ -7,21 +7,6 @@ This guide will cover the essentials for compiling and running SW-Actors. For fu
 
 ## Compiling SW-Actors
 
-### Dependencies
-SW-Actors has dependency on the [C++ Actor Framework](https://github.com/actor-framework/actor-framework), specifically the [1.0.1 
-release](https://github.com/actor-framework/actor-framework/archive/refs/tags/1.0.1.tar.gz).
-
-The following steps can be used to install the C++ Actor Framework on a Linux system:
-```bash
-wget https://github.com/actor-framework/actor-framework/archive/refs/tags/1.0.1.tar.gz
-tar -xzf 1.0.1.tar.gz
-cd actor-framework-1.0.1/
-./configure --prefix=/path/to/install
-cd build
-make # [-j] for parallel build
-make install # [use root privileges if necessary]
-```
-
 ### Steps To Compile
 To compile SW-Actors:
 
@@ -32,7 +17,15 @@ To compile SW-Actors:
  cd SW-Actors
  ```
 
-2. Add the paths in the `Makefile` to your CAF installation path if you used --prefix=/path/to/install option.
+2. Install dependancy:
+SW-Actors has dependency on the [C++ Actor Framework](https://github.com/actor-framework/actor-framework), specifically the [1.0.1 
+release](https://github.com/actor-framework/actor-framework/archive/refs/tags/1.0.1.tar.gz).
+
+The following steps can be used to install the C++ Actor Framework on a Linux system:
+```bash
+cd dependencies
+./install_caf.sh
+```
 
 3. Run:
 
@@ -50,23 +43,24 @@ Modify job scripts to match your system’s configurations, such as paths, resou
 
 **Example Command**:
 ```sh
-./swActor -D -s -p 4444 -Q ./dataset/BRCA1.fasta -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40
+./build/swActor -Q ./dataset/BRCA1.fasta -O BRCA1-40.SAM -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40
 ```
 
 ## Command-line Options
 
 | Option                | Flag                        | Description                                                                  | Default      |
 |-----------------------|-----------------------------|------------------------------------------------------------------------------|--------------|
-| **Query Input**       | `-Q` / `--query`            | Path to input query sequences                                                | *(empty)*    |
-| **Subject Input**     | `-S` / `--subject`          | Path to input subject sequences                                              | *(empty)*    |
+| **Query Input**       | `-Q` / `--query`            | Path to input query sequences (FASTA format)                                 | *(empty)*    |
+| **Subject Input**     | `-S` / `--subject`          | Path to input subject sequences (FASTA format)                               | *(empty)*    |
+| **Output File**       | `-O` / `--output`           | Output file for alignment results                                            | `output.txt` |
 | **Worker Actors**     | `-A` / `--actorNumber`      | Number of worker actors per node                                             | `1`          |
 | **Match Score**       | `-m` / `--match`            | Score for a match                                                            | `2`          |
 | **Mismatch Penalty**  | `-M` / `--mismatch`         | Penalty for a mismatch                                                       | `-1`         |
 | **Gap Penalty**       | `-g` / `--gap`              | Penalty for a gap                                                            | `-2`         |
-| **Row Divider**       | `-R` / `--devideRow`        | Division factor for scoring matrix rows                                       | `1`          |
-| **Column Divider**    | `-C` / `--devideCol`        | Division factor for scoring matrix columns                                    | `1`          |
-| **Distributed Mode**  | `-D` / `--distributedMode`  | Enable distributed execution across multiple nodes                            | `false`      |
-| **Server Mode**       | `-s` / `--serverMode`       | Start the actor system in server mode (listens for incoming connections)      | `false`      |
+| **Row Divider**       | `-R` / `--dividerRow`       | Division factor for scoring matrix rows                                      | `1`          |
+| **Column Divider**    | `-C` / `--dividerCol`       | Division factor for scoring matrix columns                                   | `1`          |
+| **Distributed Mode**  | `-D` / `--distributedMode`  | Enable distributed execution across multiple nodes                           | `false`      |
+| **Server Mode**       | `-s` / `--serverMode`       | Start the actor system in server mode (listens for incoming connections)     | `false`      |
 | **Host**              | `-H` / `--host`             | Host address (used in client mode only)                                      | `localhost`  |
 | **Port**              | `-p` / `--port`             | Port number for server/client communication                                  | `0`          |
 
