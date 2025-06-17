@@ -10,13 +10,14 @@ namespace caf
     {
         std::vector<int> workList1;
         std::vector<int> workList2;
-        std::vector<std::string> querySequences;
-        std::vector<std::string> subjectSequences;
+        std::vector<std::vector<std::string>> querySequences;
+        std::vector<std::vector<std::string>> subjectSequences;
         std::chrono::high_resolution_clock::time_point start; // Explicitly specify the type
         int position = 0;
         int counter = 0;
         int maxLenQuery = 0;
         int maxLenSubject = 0;
+        actor output;
     };
 
     behavior managerActor(stateful_actor<managerActorState> *self, const config &cfg);

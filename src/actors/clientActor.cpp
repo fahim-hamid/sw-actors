@@ -24,9 +24,11 @@ namespace caf
         for (int i = 0; i < cfg.actorNumber; ++i)
         {
             actor worker = self->spawn(pairActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore,
-                                       cfg.deviderRow, cfg.deviderCol);
+                                       cfg.dividerRow, cfg.dividerCol);
             anon_mail(self->state().server).send(worker);
         }
+
+        self->quit();
 
         return {};
     }

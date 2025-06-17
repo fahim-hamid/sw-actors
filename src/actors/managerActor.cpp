@@ -2,6 +2,7 @@
 #include "pairActor.hpp"
 #include "makePairs.hpp"
 #include "readFasta.hpp"
+#include "outputActor.hpp"
 
 namespace caf
 {
@@ -32,13 +33,13 @@ namespace caf
 
         for (int i = 0; i < self->state().querySequences.size(); i++)
         {
-            if (self->state().querySequences[i].size() > self->state().maxLenQuery)
-                self->state().maxLenQuery = self->state().querySequences[i].size();
+            if (self->state().querySequences[i][1].size() > self->state().maxLenQuery)
+                self->state().maxLenQuery = self->state().querySequences[i][1].size();
         }
         for (int i = 0; i < self->state().subjectSequences.size(); i++)
         {
-            if (self->state().subjectSequences[i].size() > self->state().maxLenSubject)
-                self->state().maxLenSubject = self->state().subjectSequences[i].size();
+            if (self->state().subjectSequences[i][1].size() > self->state().maxLenSubject)
+                self->state().maxLenSubject = self->state().subjectSequences[i][1].size();
         }
 
         if (self->state().subjectSequences.size() == 0)
@@ -49,19 +50,29 @@ namespace caf
 
         self->state().start = std::chrono::high_resolution_clock::now();
 
-        self->println("Query sequences: {}", self->state().querySequences.size());
-        self->println("Subject sequences: {}", self->state().subjectSequences.size());
+        // spawn the output actor
+        actor outputAct = self->spawn(outputActor, cfg.outputFile);
+        self->state().output = outputAct;
 
-        for (int i = 0; i < cfg.actorNumber; ++i)
+        int actorNum = cfg.actorNumber;
+
+        if(self->state().workList1.size() < actorNum)
+        {
+            actorNum = self->state().workList1.size();
+        }
+        
+        for (int i = 0; i < actorNum; ++i)
         {
             actor worker = self->spawn(pairActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore,
-                                       cfg.deviderRow, cfg.deviderCol);
+                                       cfg.dividerRow, cfg.dividerCol);
 
-            std::string seq1 = self->state().querySequences[self->state().workList1[i]];
-            std::string seq2 = self->state().subjectSequences[self->state().workList2[i]];
+            std::string id1 = self->state().querySequences[self->state().workList1[i]][0];
+            std::string seq1 = self->state().querySequences[self->state().workList1[i]][1];
+            std::string id2 = self->state().subjectSequences[self->state().workList2[i]][0];
+            std::string seq2 = self->state().subjectSequences[self->state().workList2[i]][1];
 
-            anon_mail(self->state().maxLenQuery, self->state().maxLenSubject).send(worker);
-            anon_mail(self, i, seq1, seq2).send(worker);
+            anon_mail(self->state().maxLenQuery, self->state().maxLenSubject, self->state().output).send(worker);
+            anon_mail(self, i, id1, seq1, id2, seq2).send(worker);
         }
 
         self->state().position = cfg.actorNumber - 1;
@@ -74,9 +85,11 @@ namespace caf
 
                 if (self->state().position < self->state().workList1.size())
                 {
-                    std::string seq1 = self->state().querySequences[self->state().workList1[self->state().position]];
-                    std::string seq2 = self->state().subjectSequences[self->state().workList2[self->state().position]];
-                    anon_mail(self->state().position, seq1, seq2).send(sender);
+                    std::string id1 = self->state().querySequences[self->state().workList1[self->state().position]][0];
+                    std::string seq1 = self->state().querySequences[self->state().workList1[self->state().position]][1];
+                    std::string id2 = self->state().subjectSequences[self->state().workList2[self->state().position]][0];
+                    std::string seq2 = self->state().subjectSequences[self->state().workList2[self->state().position]][1];
+                    anon_mail(self->state().position, id1, seq1, id2, seq2).send(sender);
                 }
                 else
                 {
@@ -85,11 +98,7 @@ namespace caf
 
                 if (self->state().counter == self->state().workList1.size())
                 {
-                    // Stop the timer
-                    auto stop = std::chrono::high_resolution_clock::now();
-                    auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - self->state().start);
-                    self->println("Time taken by function: {} seconds\n", duration.count());
-                    self->quit();
+                    anon_mail(self, "exit").send(self->state().output);
                 }
             },
             [=](actor clientWorker)
@@ -98,16 +107,24 @@ namespace caf
 
                 if (self->state().position < self->state().workList1.size())
                 {
-                    anon_mail(self->state().maxLenQuery, self->state().maxLenSubject).send(clientWorker);
+                    anon_mail(self->state().maxLenQuery, self->state().maxLenSubject, self->state().output).send(clientWorker);
 
-                    std::string seq1 = self->state().querySequences[self->state().workList1[self->state().position]];
-                    std::string seq2 = self->state().subjectSequences[self->state().workList2[self->state().position]];
-                    anon_mail(self, self->state().position, seq1, seq2).send(clientWorker);
+                    std::string id1 = self->state().querySequences[self->state().workList1[self->state().position]][0];
+                    std::string seq1 = self->state().querySequences[self->state().workList1[self->state().position]][1];
+                    std::string id2 = self->state().subjectSequences[self->state().workList2[self->state().position]][0];
+                    std::string seq2 = self->state().subjectSequences[self->state().workList2[self->state().position]][1];
+                    anon_mail(self, self->state().position, id1, seq1, id2, seq2).send(clientWorker);
                 }
                 else
                 {
                     anon_mail("exit").send(clientWorker);
                 }
+            },
+            [=](const std::string message) { // Stop the timer
+                auto stop = std::chrono::high_resolution_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::seconds>(stop - self->state().start);
+                self->println("Time taken by function: {} seconds\n", duration.count());
+                self->quit();
             },
         };
     }

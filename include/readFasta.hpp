@@ -4,6 +4,6 @@
 #include "config.hpp"
 
 // A function to read multiple sequences from a fasta file
-std::vector<std::string> readFasta(std::string filename);
+std::vector<std::vector<std::string>> readFasta(const std::string& filename);
 
 #endif // READFASTA_HPP

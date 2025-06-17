@@ -2,24 +2,24 @@
 
 namespace caf
 {
-    behavior blockActor(stateful_actor<blockActorState> *self, actor workManager, int rowPose, std::string seq1, std::string seq2, int matchScore, int mismatchScore, int gapScore, int deviderRow, int deviderCol)
+    behavior blockActor(stateful_actor<blockActorState> *self, actor workManager, int rowPose, std::string seq1, std::string seq2, int matchScore, int mismatchScore, int gapScore, int dividerRow, int dividerCol)
     {
 
         int m = seq1.length();
         int n = seq2.length();
 
-        self->state().rowChunk = m / deviderRow;
-        int colChunk = n / deviderCol;
+        self->state().rowChunk = m / dividerRow;
+        int colChunk = n / dividerCol;
 
-        std::vector<int> rowBlockIndex = std::vector<int>((deviderRow + 1), (m + 1));
-        self->state().colBlockIndex = std::vector<int>((deviderCol + 1), (n + 1));
+        std::vector<int> rowBlockIndex = std::vector<int>((dividerRow + 1), (m + 1));
+        self->state().colBlockIndex = std::vector<int>((dividerCol + 1), (n + 1));
 
-        for (int i = 0; i < deviderRow; i++)
+        for (int i = 0; i < dividerRow; i++)
         {
             rowBlockIndex[i] = i * self->state().rowChunk + 1;
         }
 
-        for (int i = 0; i < deviderCol; i++)
+        for (int i = 0; i < dividerCol; i++)
         {
             self->state().colBlockIndex[i] = i * colChunk + 1;
         }
@@ -38,14 +38,14 @@ namespace caf
         self->state().rowStart = rowBlockIndex[self->state().rowPose];
         self->state().rowEnd = rowBlockIndex[self->state().rowPose + 1] - 1;
 
-        if (rowPose < deviderRow - 1)
-            self->state().nextBlockActor = self->spawn(blockActor, workManager, (rowPose + 1), seq1, seq2, matchScore, mismatchScore, gapScore, deviderRow, deviderCol);
+        if (rowPose < dividerRow - 1)
+            self->state().nextBlockActor = self->spawn(blockActor, workManager, (rowPose + 1), seq1, seq2, matchScore, mismatchScore, gapScore, dividerRow, dividerCol);
 
         if (rowPose == 0)
         {
             int colPose = 0;
 
-            while (colPose < deviderCol)
+            while (colPose < dividerCol)
             {
                 int colStarting = self->state().colBlockIndex[colPose];
                 int colEnding = self->state().colBlockIndex[colPose + 1] - 1;
@@ -69,12 +69,12 @@ namespace caf
                     }
                 }
 
-                if (self->state().rowPose < deviderRow - 1)
+                if (self->state().rowPose < dividerRow - 1)
                 {
                     std::vector<int> partialVector(
                         self->state().blockScoreMatrix.back().begin() + colStarting,
                         self->state().blockScoreMatrix.back().begin() + colEnding + 1);
-                    anon_mail(colPose, partialVector, deviderRow, deviderCol).send(self->state().nextBlockActor);
+                    anon_mail(colPose, partialVector, dividerRow, dividerCol).send(self->state().nextBlockActor);
                 }
 
                 colPose++;
@@ -84,7 +84,7 @@ namespace caf
 
         // receive the messages
         return {
-            [=](int colPose, std::vector<int> previousvector, int deviderRow, int deviderCol)
+            [=](int colPose, std::vector<int> previousvector, int dividerRow, int dividerCol)
             {
                 int colStarting = self->state().colBlockIndex[colPose];
                 int colEnding = self->state().colBlockIndex[colPose + 1] - 1;
@@ -113,14 +113,14 @@ namespace caf
                         }
                     }
                 }
-                if (self->state().rowPose < deviderRow - 1)
+                if (self->state().rowPose < dividerRow - 1)
                 {
                     std::vector<int> partialVector(
                         self->state().blockScoreMatrix.back().begin() + colStarting,
                         self->state().blockScoreMatrix.back().begin() + colEnding + 1);
-                    anon_mail(colPose, partialVector, deviderRow, deviderCol).send(self->state().nextBlockActor);
+                    anon_mail(colPose, partialVector, dividerRow, dividerCol).send(self->state().nextBlockActor);
                 }
-                if (colPose == deviderCol - 1)
+                if (colPose == dividerCol - 1)
                     anon_mail(self, self->state().rowPose, self->state().maxScore, self->state().maxRow, self->state().maxCol).send(self->state().workManager);
             },
             [=](int row, int col)
@@ -147,28 +147,28 @@ namespace caf
 
                     if (score == diagonal + matchMismatchScore)
                     {
-                        alignedSeq1 = self->state().seq1[row - 1] + alignedSeq1;
-                        alignedSeq2 = self->state().seq2[col - 1] + alignedSeq2;
+                        if (matchMismatchScore == self->state().matchScore)
+                            anon_mail('=').send(self->state().workManager);
+                        else
+                            anon_mail('X').send(self->state().workManager);
                         --row;
                         --col;
                         score = diagonal;
                     }
                     else if (score == upScore + self->state().gapScore)
                     {
-                        alignedSeq1 = self->state().seq1[row - 1] + alignedSeq1;
-                        alignedSeq2 = "-" + alignedSeq2;
+                        anon_mail('I').send(self->state().workManager);
                         --row;
                         score = upScore;
                     }
                     else if (score == leftScore + self->state().gapScore)
                     {
-                        alignedSeq1 = "-" + alignedSeq1;
-                        alignedSeq2 = self->state().seq2[col - 1] + alignedSeq2;
+                        anon_mail('D').send(self->state().workManager);
                         --col;
                         score = leftScore;
                     }
                 }
-                anon_mail(row, col, self->state().rowPose - 1, score, alignedSeq1, alignedSeq2).send(self->state().workManager);
+                anon_mail(row, col, self->state().rowPose - 1, score).send(self->state().workManager);
             },
             [=](std::string exit)
             {

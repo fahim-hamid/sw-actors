@@ -12,6 +12,7 @@ namespace caf
         int gapScore = 0;
         std::vector<std::vector<int>> scoreMatrix;
         actor manager;
+        actor output;
     };
 
     behavior serialActor(stateful_actor<serialActorState> *self, int matchScore, int mismatchScore, int gapScore);

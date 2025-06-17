@@ -25,7 +25,7 @@ namespace caf
         actor workManager;
     };
 
-    behavior blockActor(stateful_actor<blockActorState> *self, actor workManager, int rowPose, std::string seq1, std::string seq2, int matchScore, int mismatchScore, int gapScore, int deviderRow, int deviderCol);
+    behavior blockActor(stateful_actor<blockActorState> *self, actor workManager, int rowPose, std::string seq1, std::string seq2, int matchScore, int mismatchScore, int gapScore, int dividerRow, int dividerCol);
 
 } // namespace caf
 

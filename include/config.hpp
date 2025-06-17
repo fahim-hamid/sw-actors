@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <chrono>
@@ -30,12 +31,13 @@ namespace caf
         bool serverMode = false;
         std::string queryInput = "";
         std::string subjectInput = "";
+        std::string outputFile = "output.txt";
         int actorNumber = 1;
         int matchScore = 2;
         int mismatchScore = -1;
         int gapScore = -2;
-        int deviderRow = 1;
-        int deviderCol = 1;
+        int dividerRow = 1;
+        int dividerCol = 1;
 
         config()
         {
@@ -47,12 +49,13 @@ namespace caf
                 .add(serverMode, "serverMode,s", "enable server mode")
                 .add(queryInput, "query,Q", "input query sequences")
                 .add(subjectInput, "subject,S", "input subject sequences")
+                .add(outputFile, "output,O", "output file for results (default: output.txt)")
                 .add(actorNumber, "actorNumber,A", "Number of worker actors per each node (default: 1)")
                 .add(matchScore, "match,m", "score for a match (default: 2)")
                 .add(mismatchScore, "mismatch,M", "penalty for a mismatch (default: -1)")
                 .add(gapScore, "gap,g", "penalty for a gap (default: -2)")
-                .add(deviderRow, "devideRow, R", "devision counts for scor matrix rows (default: 1)")
-                .add(deviderCol, "devideCol, C", "devision counts for scor matrix columns (default: 1)");
+                .add(dividerRow, "dividerRow, R", "division counts for scor matrix rows (default: 1)")
+                .add(dividerCol, "dividerCol, C", "division counts for scor matrix columns (default: 1)");
         }
     };
 
