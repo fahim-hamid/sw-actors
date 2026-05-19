@@ -1,0 +1,23 @@
+# CMake and local build output
+/build/
+/cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# Generated runtime output
+*.SAM
+*.out
+*.log
+
+# Local dependency/build scratch
+/dependencies/install/
+/dependencies/*.tar.gz
+/dependencies/actor-framework-*/
+
+# Editor and OS noise
+.DS_Store
+.idea/
+.vscode/
+*.swp

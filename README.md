@@ -5,10 +5,38 @@ SW-Actors uses the Actor Model to perform parallelized sequence alignment with [
 ## Documentation
 This guide will cover the essentials for compiling and running SW-Actors. For further details or to report any issues, feel free to open an issue in this repository.
 
-## Compiling SW-Actors
+## Building SW-Actors
 
-### Steps To Compile
-To compile SW-Actors:
+SW-Actors uses CMake and expects the [C++ Actor Framework](https://github.com/actor-framework/actor-framework) to be provided by your system or cluster environment. This repository does not vendor or install CAF.
+
+### Dependencies
+
+- CMake 3.20 or newer
+- A C++17 compiler
+- C++ Actor Framework with the `core` and `io` components available to CMake
+
+On systems where CAF is installed in a non-standard prefix, pass its install prefix through `CMAKE_PREFIX_PATH`:
+
+```sh
+cmake -S . -B build/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/path/to/caf
+cmake --build build/release -j
+```
+
+If CAF is available in the default CMake search path, use the provided presets:
+
+```sh
+cmake --preset release
+cmake --build --preset release
+```
+
+The executable is written to:
+
+```text
+build/release/swActor
+```
+
+### Steps To Build
+To build SW-Actors:
 
 1. Clone the repository:
 
@@ -17,20 +45,15 @@ To compile SW-Actors:
  cd SW-Actors
  ```
 
-2. Install dependancy:
-SW-Actors has dependency on the [C++ Actor Framework](https://github.com/actor-framework/actor-framework), specifically the [1.0.1 
-release](https://github.com/actor-framework/actor-framework/archive/refs/tags/1.0.1.tar.gz).
+2. Make CAF available in your environment.
 
-The following steps can be used to install the C++ Actor Framework on a Linux system:
-```bash
-cd dependencies
-./install_caf.sh
-```
+   For example, load your cluster module or point CMake at an existing CAF prefix with `CMAKE_PREFIX_PATH`.
 
-3. Run:
+3. Configure and build:
 
-```
-make
+```sh
+cmake --preset release
+cmake --build --preset release
 ```
 ---
 
@@ -43,7 +66,7 @@ Modify job scripts to match your system’s configurations, such as paths, resou
 
 **Example Command**:
 ```sh
-./build/swActor -Q ./dataset/BRCA1.fasta -O BRCA1-40.SAM -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40
+./build/release/swActor -Q ./dataset/BRCA1.fasta -O BRCA1-40.SAM -A 40 -m 2 -M -1 -g -2 -R 1 -C 1 --caf.scheduler.max-threads=40
 ```
 
 ## Command-line Options
