@@ -4,7 +4,7 @@
     {
       "name": "debug",
       "displayName": "Debug",
-      "description": "Configure a debug build with the system CAF package.",
+      "description": "Debug build",
       "binaryDir": "${sourceDir}/build/debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
@@ -14,10 +14,20 @@
     {
       "name": "release",
       "displayName": "Release",
-      "description": "Configure an optimized build with the system CAF package.",
+      "description": "Release build",
       "binaryDir": "${sourceDir}/build/release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "profile",
+      "displayName": "Profile",
+      "description": "Release build with debug info still enabled",
+      "binaryDir": "${sourceDir}/build/profile",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
@@ -30,6 +40,10 @@
     {
       "name": "release",
       "configurePreset": "release"
+    },
+    {
+      "name": "profile",
+      "configurePreset": "profile"
     }
   ]
 }
