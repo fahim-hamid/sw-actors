@@ -82,6 +82,8 @@ Modify job scripts to match your system’s configurations, such as paths, resou
 | **Gap Penalty**       | `-g` / `--gap`              | Penalty for a gap                                                            | `-2`         |
 | **Row Divider**       | `-R` / `--dividerRow`       | Division factor for scoring matrix rows                                      | `1`          |
 | **Column Divider**    | `-C` / `--dividerCol`       | Division factor for scoring matrix columns                                   | `1`          |
+| **Max Sequences**     | `--max-sequences`           | Maximum FASTA records to read per input (`0` means unlimited)                | `0`          |
+| **Max Pairs**         | `--max-pairs`               | Maximum sequence pairs to process (`0` means unlimited)                      | `0`          |
 | **Distributed Mode**  | `-D` / `--distributedMode`  | Enable distributed execution across multiple nodes                           | `false`      |
 | **Server Mode**       | `-s` / `--serverMode`       | Start the actor system in server mode (listens for incoming connections)     | `false`      |
 | **Host**              | `-H` / `--host`             | Host address (used in client mode only)                                      | `localhost`  |

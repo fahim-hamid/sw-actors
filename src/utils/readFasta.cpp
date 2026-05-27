@@ -1,7 +1,7 @@
 #include "readFasta.hpp"
 
 // Reads a FASTA file and returns a pair of vectors: (sequence IDs, sequences)
-std::vector<std::vector<std::string>> readFasta(const std::string& filename) {
+std::vector<std::vector<std::string>> readFasta(const std::string& filename, size_t maxSequences) {
     std::vector<std::vector<std::string>> result;
 
     std::ifstream inputFile(filename);
@@ -20,6 +20,9 @@ std::vector<std::vector<std::string>> readFasta(const std::string& filename) {
         if (line[0] == '>') {
             if (!seq.empty()) {
                 result.push_back({current_id, seq});
+                if (maxSequences != 0 && result.size() >= maxSequences) {
+                    return result;
+                }
                 seq.clear();
             }
             current_id = line.substr(1); // Remove the '>' character

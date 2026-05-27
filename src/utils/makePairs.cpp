@@ -1,6 +1,6 @@
 #include "makePairs.hpp"
 
-std::vector<std::vector<int>> makePairs(int querySize, int subjectSize)
+std::vector<std::vector<int>> makePairs(int querySize, int subjectSize, size_t maxPairs)
 {
     std::vector<std::vector<int>> pairs(2);
 
@@ -13,6 +13,10 @@ std::vector<std::vector<int>> makePairs(int querySize, int subjectSize)
             {
                 pairs[0].push_back(i);
                 pairs[1].push_back(j);
+                if (maxPairs != 0 && pairs[0].size() >= maxPairs)
+                {
+                    return pairs;
+                }
             }
         }
     }
@@ -24,6 +28,10 @@ std::vector<std::vector<int>> makePairs(int querySize, int subjectSize)
             {
                 pairs[0].push_back(i);
                 pairs[1].push_back(j);
+                if (maxPairs != 0 && pairs[0].size() >= maxPairs)
+                {
+                    return pairs;
+                }
             }
         }
     }

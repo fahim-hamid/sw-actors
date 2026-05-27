@@ -11,6 +11,7 @@
 #include <string>
 #include <chrono>
 #include <algorithm>
+#include <cstddef>
 #include <string_view>
 #include <utility>
 #include <tuple>
@@ -38,6 +39,8 @@ namespace caf
         int gapScore = -2;
         int dividerRow = 1;
         int dividerCol = 1;
+        size_t maxSequences = 0;
+        size_t maxPairs = 0;
 
         config()
         {
@@ -55,7 +58,9 @@ namespace caf
                 .add(mismatchScore, "mismatch,M", "penalty for a mismatch (default: -1)")
                 .add(gapScore, "gap,g", "penalty for a gap (default: -2)")
                 .add(dividerRow, "dividerRow, R", "division counts for scor matrix rows (default: 1)")
-                .add(dividerCol, "dividerCol, C", "division counts for scor matrix columns (default: 1)");
+                .add(dividerCol, "dividerCol, C", "division counts for scor matrix columns (default: 1)")
+                .add(maxSequences, "max-sequences", "maximum FASTA records to read per input, 0 means unlimited")
+                .add(maxPairs, "max-pairs", "maximum sequence pairs to process, 0 means unlimited");
         }
     };
 

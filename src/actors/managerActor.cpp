@@ -24,10 +24,10 @@ namespace caf
             }
         }
 
-        self->state().querySequences = readFasta(cfg.queryInput);
-        self->state().subjectSequences = readFasta(cfg.subjectInput);
+        self->state().querySequences = readFasta(cfg.queryInput, cfg.maxSequences);
+        self->state().subjectSequences = readFasta(cfg.subjectInput, cfg.maxSequences);
 
-        std::vector<std::vector<int>> paires = makePairs(self->state().querySequences.size(), self->state().subjectSequences.size());
+        std::vector<std::vector<int>> paires = makePairs(self->state().querySequences.size(), self->state().subjectSequences.size(), cfg.maxPairs);
         self->state().workList1 = paires[0];
         self->state().workList2 = paires[1];
 
@@ -56,6 +56,11 @@ namespace caf
 
         int actorNum = cfg.actorNumber;
 
+        if (self->state().workList1.empty())
+        {
+            anon_mail(self, "exit").send(self->state().output);
+        }
+
         if(self->state().workList1.size() < actorNum)
         {
             actorNum = self->state().workList1.size();
@@ -75,7 +80,7 @@ namespace caf
             anon_mail(self, i, id1, seq1, id2, seq2).send(worker);
         }
 
-        self->state().position = cfg.actorNumber - 1;
+        self->state().position = actorNum - 1;
 
         return {
             [=](actor sender, int position, int maxScore)
