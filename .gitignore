@@ -1,23 +1,71 @@
-# CMake and local build output
-/build/
-/cmake-build-*/
-CMakeCache.txt
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Linker files
+*.ilk
+
+# Debugger Files
+*.pdb
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+*.so.*
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Build directories
+build/
+Build/
+build-*/
+
+# CMake generated files
 CMakeFiles/
+CMakeCache.txt
 cmake_install.cmake
+Makefile
+install_manifest.txt
 compile_commands.json
 
-# Generated runtime output
-*.SAM
-*.out
+# Temporary files
+*.tmp
 *.log
-
-# Local dependency/build scratch
-/dependencies/install/
-/dependencies/*.tar.gz
-/dependencies/actor-framework-*/
-
-# Editor and OS noise
-.DS_Store
-.idea/
-.vscode/
+*.bak
 *.swp
+
+# vcpkg
+vcpkg_installed/
+
+# debug information files
+*.dwo
+
+# test output & cache
+Testing/
+.cache/
+
+# Visual Studio
+.vs/

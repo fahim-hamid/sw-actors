@@ -1,49 +1,245 @@
 {
   "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
   "configurePresets": [
     {
-      "name": "debug",
-      "displayName": "Debug",
-      "description": "Debug build",
-      "binaryDir": "${sourceDir}/build/debug",
+      "name": "base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
       }
     },
     {
       "name": "release",
-      "displayName": "Release",
-      "description": "Release build",
-      "binaryDir": "${sourceDir}/build/release",
+      "hidden": true,
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "CMAKE_BUILD_TYPE": "Release"
       }
     },
     {
-      "name": "profile",
-      "displayName": "Profile",
-      "description": "Release build with debug info still enabled",
-      "binaryDir": "${sourceDir}/build/profile",
+      "name": "profiling",
+      "hidden": true,
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    },
+    {
+      "name": "system-caf",
+      "hidden": true,
+      "inherits": "base"
+    },
+    {
+      "name": "caf-prefix",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{CAF_ROOT}"
+      }
+    },
+    {
+      "name": "vcpkg",
+      "hidden": true,
+      "inherits": "base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "debug-system",
+      "displayName": "Debug (system CAF)",
+      "description": "Debug build using CAF from the system CMake package search path.",
+      "inherits": [
+        "system-caf",
+        "debug"
+      ]
+    },
+    {
+      "name": "release-system",
+      "displayName": "Release (system CAF)",
+      "description": "Release build using CAF from the system CMake package search path.",
+      "inherits": [
+        "system-caf",
+        "release"
+      ]
+    },
+    {
+      "name": "profiling-system",
+      "displayName": "Profiling (system CAF)",
+      "description": "RelWithDebInfo build using CAF from the system CMake package search path.",
+      "inherits": [
+        "system-caf",
+        "profiling"
+      ]
+    },
+    {
+      "name": "debug-caf-prefix",
+      "displayName": "Debug (CAF_ROOT)",
+      "description": "Debug build using CAF from the install prefix in the CAF_ROOT environment variable.",
+      "inherits": [
+        "caf-prefix",
+        "debug"
+      ]
+    },
+    {
+      "name": "release-caf-prefix",
+      "displayName": "Release (CAF_ROOT)",
+      "description": "Release build using CAF from the install prefix in the CAF_ROOT environment variable.",
+      "inherits": [
+        "caf-prefix",
+        "release"
+      ]
+    },
+    {
+      "name": "profiling-caf-prefix",
+      "displayName": "Profiling (CAF_ROOT)",
+      "description": "RelWithDebInfo build using CAF from the install prefix in the CAF_ROOT environment variable.",
+      "inherits": [
+        "caf-prefix",
+        "profiling"
+      ]
+    },
+    {
+      "name": "debug-vcpkg",
+      "displayName": "Debug (vcpkg)",
+      "description": "Debug build using CAF from vcpkg.",
+      "inherits": [
+        "vcpkg",
+        "debug"
+      ]
+    },
+    {
+      "name": "release-vcpkg",
+      "displayName": "Release (vcpkg)",
+      "description": "Release build using CAF from vcpkg.",
+      "inherits": [
+        "vcpkg",
+        "release"
+      ]
+    },
+    {
+      "name": "profiling-vcpkg",
+      "displayName": "Profiling (vcpkg)",
+      "description": "RelWithDebInfo build using CAF from vcpkg.",
+      "inherits": [
+        "vcpkg",
+        "profiling"
+      ]
     }
   ],
   "buildPresets": [
     {
-      "name": "debug",
-      "configurePreset": "debug"
+      "name": "debug-system",
+      "configurePreset": "debug-system"
     },
     {
-      "name": "release",
-      "configurePreset": "release"
+      "name": "release-system",
+      "configurePreset": "release-system"
     },
     {
-      "name": "profile",
-      "configurePreset": "profile"
+      "name": "profiling-system",
+      "configurePreset": "profiling-system"
+    },
+    {
+      "name": "debug-caf-prefix",
+      "configurePreset": "debug-caf-prefix"
+    },
+    {
+      "name": "release-caf-prefix",
+      "configurePreset": "release-caf-prefix"
+    },
+    {
+      "name": "profiling-caf-prefix",
+      "configurePreset": "profiling-caf-prefix"
+    },
+    {
+      "name": "debug-vcpkg",
+      "configurePreset": "debug-vcpkg"
+    },
+    {
+      "name": "release-vcpkg",
+      "configurePreset": "release-vcpkg"
+    },
+    {
+      "name": "profiling-vcpkg",
+      "configurePreset": "profiling-vcpkg"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug-system",
+      "configurePreset": "debug-system",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release-system",
+      "configurePreset": "release-system",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "profiling-system",
+      "configurePreset": "profiling-system",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "debug-caf-prefix",
+      "configurePreset": "debug-caf-prefix",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release-caf-prefix",
+      "configurePreset": "release-caf-prefix",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "profiling-caf-prefix",
+      "configurePreset": "profiling-caf-prefix",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "debug-vcpkg",
+      "configurePreset": "debug-vcpkg",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release-vcpkg",
+      "configurePreset": "release-vcpkg",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "profiling-vcpkg",
+      "configurePreset": "profiling-vcpkg",
+      "output": {
+        "outputOnFailure": true
+      }
     }
   ]
 }
