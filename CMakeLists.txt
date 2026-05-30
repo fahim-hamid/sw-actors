@@ -4,7 +4,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(sw-actors LANGUAGES CXX)
 
-find_package(CAF REQUIRED COMPONENTS core io)
+find_package(CAF CONFIG REQUIRED COMPONENTS core io)
 
 add_executable(swActor
   src/main.cpp
@@ -19,7 +19,7 @@ add_executable(swActor
   src/utils/alignerInfo.cpp
 )
 
-target_compile_features(swActor PRIVATE cxx_std_17)
+target_compile_features(swActor PRIVATE cxx_std_23)
 
 target_include_directories(swActor PRIVATE
   "${PROJECT_SOURCE_DIR}/include"

@@ -1,7 +1,7 @@
 {
   "name": "sw-actors",
   "version-string": "0.1.0",
-  "builtin-baseline": "9e53836916341b64a14162a78ba9802488034a5f",
+  "builtin-baseline": "00d899c410b31467733472fc3a83a25729046b13",
   "dependencies": [
     "caf"
   ]
