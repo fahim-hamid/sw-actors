@@ -1,8 +1,11 @@
 #include "managerActor.hpp"
 #include "pairActor.hpp"
 #include "makePairs.hpp"
-#include "readFasta.hpp"
 #include "outputActor.hpp"
+#include "sw/fasta.hpp"
+
+#include <algorithm>
+#include <utility>
 
 namespace caf
 {
@@ -24,23 +27,55 @@ namespace caf
             }
         }
 
-        self->state().querySequences = readFasta(cfg.queryInput, cfg.maxSequences);
-        self->state().subjectSequences = readFasta(cfg.subjectInput, cfg.maxSequences);
+        auto query_sequences = sw::read_fasta(cfg.queryInput, cfg.maxSequences);
+        if (!query_sequences)
+        {
+            self->println("Failed to read query FASTA: {}", query_sequences.error().message);
+            self->quit();
+            return {};
+        }
+        self->state().querySequences = std::move(*query_sequences);
+        if (self->state().querySequences.empty())
+        {
+            self->println("Query FASTA contains no records");
+            self->quit();
+            return {};
+        }
 
-        std::vector<std::vector<int>> paires = makePairs(self->state().querySequences.size(), self->state().subjectSequences.size(), cfg.maxPairs);
+        if (!cfg.subjectInput.empty())
+        {
+            auto subject_sequences = sw::read_fasta(cfg.subjectInput, cfg.maxSequences);
+            if (!subject_sequences)
+            {
+                self->println("Failed to read subject FASTA: {}", subject_sequences.error().message);
+                self->quit();
+                return {};
+            }
+            self->state().subjectSequences = std::move(*subject_sequences);
+            if (self->state().subjectSequences.empty())
+            {
+                self->println("Subject FASTA contains no records");
+                self->quit();
+                return {};
+            }
+        }
+
+        std::vector<std::vector<int>> paires = makePairs(
+            self->state().querySequences.size(),
+            self->state().subjectSequences.size(),
+            cfg.maxPairs);
         self->state().workList1 = paires[0];
         self->state().workList2 = paires[1];
 
-        for (int i = 0; i < self->state().querySequences.size(); i++)
-        {
-            if (self->state().querySequences[i][1].size() > self->state().maxLenQuery)
-                self->state().maxLenQuery = self->state().querySequences[i][1].size();
-        }
-        for (int i = 0; i < self->state().subjectSequences.size(); i++)
-        {
-            if (self->state().subjectSequences[i][1].size() > self->state().maxLenSubject)
-                self->state().maxLenSubject = self->state().subjectSequences[i][1].size();
-        }
+        for (const auto &sequence : self->state().querySequences)
+            self->state().maxLenQuery = std::max(
+                self->state().maxLenQuery,
+                static_cast<int>(sequence.data.size()));
+
+        for (const auto &sequence : self->state().subjectSequences)
+            self->state().maxLenSubject = std::max(
+                self->state().maxLenSubject,
+                static_cast<int>(sequence.data.size()));
 
         if (self->state().subjectSequences.size() == 0)
         {
@@ -71,13 +106,11 @@ namespace caf
             actor worker = self->spawn(pairActor, cfg.matchScore, cfg.mismatchScore, cfg.gapScore,
                                        cfg.dividerRow, cfg.dividerCol);
 
-            std::string id1 = self->state().querySequences[self->state().workList1[i]][0];
-            std::string seq1 = self->state().querySequences[self->state().workList1[i]][1];
-            std::string id2 = self->state().subjectSequences[self->state().workList2[i]][0];
-            std::string seq2 = self->state().subjectSequences[self->state().workList2[i]][1];
+            const auto &query = self->state().querySequences[self->state().workList1[i]];
+            const auto &subject = self->state().subjectSequences[self->state().workList2[i]];
 
             anon_mail(self->state().maxLenQuery, self->state().maxLenSubject, self->state().output).send(worker);
-            anon_mail(self, i, id1, seq1, id2, seq2).send(worker);
+            anon_mail(self, i, query.id, query.data, subject.id, subject.data).send(worker);
         }
 
         self->state().position = actorNum - 1;
@@ -90,11 +123,9 @@ namespace caf
 
                 if (self->state().position < self->state().workList1.size())
                 {
-                    std::string id1 = self->state().querySequences[self->state().workList1[self->state().position]][0];
-                    std::string seq1 = self->state().querySequences[self->state().workList1[self->state().position]][1];
-                    std::string id2 = self->state().subjectSequences[self->state().workList2[self->state().position]][0];
-                    std::string seq2 = self->state().subjectSequences[self->state().workList2[self->state().position]][1];
-                    anon_mail(self->state().position, id1, seq1, id2, seq2).send(sender);
+                    const auto &query = self->state().querySequences[self->state().workList1[self->state().position]];
+                    const auto &subject = self->state().subjectSequences[self->state().workList2[self->state().position]];
+                    anon_mail(self->state().position, query.id, query.data, subject.id, subject.data).send(sender);
                 }
                 else
                 {
@@ -114,11 +145,9 @@ namespace caf
                 {
                     anon_mail(self->state().maxLenQuery, self->state().maxLenSubject, self->state().output).send(clientWorker);
 
-                    std::string id1 = self->state().querySequences[self->state().workList1[self->state().position]][0];
-                    std::string seq1 = self->state().querySequences[self->state().workList1[self->state().position]][1];
-                    std::string id2 = self->state().subjectSequences[self->state().workList2[self->state().position]][0];
-                    std::string seq2 = self->state().subjectSequences[self->state().workList2[self->state().position]][1];
-                    anon_mail(self, self->state().position, id1, seq1, id2, seq2).send(clientWorker);
+                    const auto &query = self->state().querySequences[self->state().workList1[self->state().position]];
+                    const auto &subject = self->state().subjectSequences[self->state().workList2[self->state().position]];
+                    anon_mail(self, self->state().position, query.id, query.data, subject.id, subject.data).send(clientWorker);
                 }
                 else
                 {

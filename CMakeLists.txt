@@ -8,13 +8,13 @@ find_package(CAF CONFIG REQUIRED COMPONENTS core io)
 
 add_executable(swActor
   src/main.cpp
+  src/fasta.cpp
   src/actors/managerActor.cpp
   src/actors/clientActor.cpp
   src/actors/serialActor.cpp
   src/actors/pairActor.cpp
   src/actors/blockActor.cpp
   src/actors/outputActor.cpp
-  src/utils/readFasta.cpp
   src/utils/makePairs.cpp
   src/utils/alignerInfo.cpp
 )

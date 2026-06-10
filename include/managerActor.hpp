@@ -2,6 +2,7 @@
 #define MANAGER_ACTOR_HPP
 
 #include "config.hpp"
+#include "sw/sequence.hpp"
 
 namespace caf
 {
@@ -10,8 +11,8 @@ namespace caf
     {
         std::vector<int> workList1;
         std::vector<int> workList2;
-        std::vector<std::vector<std::string>> querySequences;
-        std::vector<std::vector<std::string>> subjectSequences;
+        std::vector<sw::Sequence> querySequences;
+        std::vector<sw::Sequence> subjectSequences;
         std::chrono::high_resolution_clock::time_point start; // Explicitly specify the type
         int position = 0;
         int counter = 0;
