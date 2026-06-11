@@ -9,11 +9,9 @@
 #include <string>
 #include <vector>
 
-namespace sw
-{
+namespace sw {
 
-enum class FastaErrorCode
-{
+enum class FastaErrorCode {
     open_failed,
     sequence_before_header,
     empty_identifier,
@@ -21,8 +19,7 @@ enum class FastaErrorCode
     read_failed,
 };
 
-struct FastaError
-{
+struct FastaError {
     FastaErrorCode code;
     std::size_t line = 0;
     std::string message;
@@ -31,11 +28,11 @@ struct FastaError
 using FastaResult = std::expected<std::vector<Sequence>, FastaError>;
 
 [[nodiscard]]
-FastaResult read_fasta(std::istream &input, std::size_t max_sequences = 0);
+FastaResult read_fasta(std::istream& input, std::size_t max_sequences = 0);
 
 [[nodiscard]]
 FastaResult read_fasta(
-    const std::filesystem::path &path,
+    const std::filesystem::path& path,
     std::size_t max_sequences = 0);
 
-} // namespace sw
+}

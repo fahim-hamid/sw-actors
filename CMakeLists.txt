@@ -10,14 +10,10 @@ add_executable(swActor
   src/main.cpp
   src/fasta.cpp
   src/smith_waterman.cpp
-  src/actors/managerActor.cpp
-  src/actors/clientActor.cpp
-  src/actors/serialActor.cpp
-  src/actors/pairActor.cpp
-  src/actors/blockActor.cpp
-  src/actors/outputActor.cpp
-  src/utils/makePairs.cpp
-  src/utils/alignerInfo.cpp
+  src/actors/client_actor.cpp
+  src/actors/server_actor.cpp
+  src/actors/worker_actor.cpp
+  src/actors/output_actor.cpp
 )
 
 target_compile_features(swActor PRIVATE cxx_std_23)

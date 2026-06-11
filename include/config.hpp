@@ -1,69 +1,64 @@
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#pragma once
 
-#include "caf/all.hpp"
-#include "caf/io/all.hpp"
+#include <caf/actor_system_config.hpp>
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string>
-#include <chrono>
-#include <algorithm>
 #include <cstddef>
-#include <string_view>
-#include <utility>
-#include <tuple>
+#include <cstdint>
+#include <string>
 
-CAF_BEGIN_TYPE_ID_BLOCK(myType, first_custom_type_id)
-CAF_ADD_TYPE_ID(myType, (std::vector<int>))
-CAF_END_TYPE_ID_BLOCK(myType)
+namespace sw {
 
-namespace caf
-{
+class AppConfig : public caf::actor_system_config {
+public:
+    std::uint16_t port = 0;
+    std::string host = "localhost";
+    bool distributed_mode = false;
+    bool server_mode = false;
 
-    class config : public actor_system_config
+    std::string query_input;
+    std::string subject_input;
+    std::string output_file = "output.txt";
+
+    std::size_t worker_count = 1;
+    std::size_t maximum_sequences = 0;
+    std::size_t maximum_pairs = 0;
+
+    std::int32_t match_score = 2;
+    std::int32_t mismatch_score = -1;
+    std::int32_t gap_score = -2;
+
+    AppConfig()
     {
-    public:
-        uint16_t port = 0;
-        std::string host = "localhost";
-        bool distributedMode = false;
-        bool serverMode = false;
-        std::string queryInput = "";
-        std::string subjectInput = "";
-        std::string outputFile = "output.txt";
-        int actorNumber = 1;
-        int matchScore = 2;
-        int mismatchScore = -1;
-        int gapScore = -2;
-        int dividerRow = 1;
-        int dividerCol = 1;
-        size_t maxSequences = 0;
-        size_t maxPairs = 0;
+        opt_group{custom_options_, "global"}
+            .add(port, "port,p", "server port")
+            .add(host, "host,H", "server host")
+            .add(
+                distributed_mode,
+                "distributedMode,D",
+                "enable distributed execution")
+            .add(
+                server_mode,
+                "serverMode,s",
+                "run the distributed server")
+            .add(query_input, "query,Q", "query FASTA input")
+            .add(subject_input, "subject,S", "subject FASTA input")
+            .add(output_file, "output,O", "alignment output file")
+            .add(
+                worker_count,
+                "actorNumber,A",
+                "persistent workers in this process")
+            .add(match_score, "match,m", "match score")
+            .add(mismatch_score, "mismatch,M", "mismatch score")
+            .add(gap_score, "gap,g", "gap score")
+            .add(
+                maximum_sequences,
+                "max-sequences",
+                "maximum FASTA records per input, 0 means unlimited")
+            .add(
+                maximum_pairs,
+                "max-pairs",
+                "maximum alignment pairs, 0 means unlimited");
+    }
+};
 
-        config()
-        {
-            // Add the port and host to the config
-            opt_group{custom_options_, "global"}
-                .add(port, "port,p", "set port")
-                .add(host, "host,H", "set host (ignored in server mode)")
-                .add(distributedMode, "distributedMode,D", "enable distributed mode")
-                .add(serverMode, "serverMode,s", "enable server mode")
-                .add(queryInput, "query,Q", "input query sequences")
-                .add(subjectInput, "subject,S", "input subject sequences")
-                .add(outputFile, "output,O", "output file for results (default: output.txt)")
-                .add(actorNumber, "actorNumber,A", "Number of worker actors per each node (default: 1)")
-                .add(matchScore, "match,m", "score for a match (default: 2)")
-                .add(mismatchScore, "mismatch,M", "penalty for a mismatch (default: -1)")
-                .add(gapScore, "gap,g", "penalty for a gap (default: -2)")
-                .add(dividerRow, "dividerRow, R", "division counts for scor matrix rows (default: 1)")
-                .add(dividerCol, "dividerCol, C", "division counts for scor matrix columns (default: 1)")
-                .add(maxSequences, "max-sequences", "maximum FASTA records to read per input, 0 means unlimited")
-                .add(maxPairs, "max-pairs", "maximum sequence pairs to process, 0 means unlimited");
-        }
-    };
-
-} // namespace caf
-
-#endif // CONFIG_HPP
+}
