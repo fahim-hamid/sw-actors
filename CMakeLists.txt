@@ -9,6 +9,7 @@ find_package(CAF CONFIG REQUIRED COMPONENTS core io)
 add_executable(swActor
   src/main.cpp
   src/fasta.cpp
+  src/smith_waterman.cpp
   src/actors/managerActor.cpp
   src/actors/clientActor.cpp
   src/actors/serialActor.cpp
